@@ -7,6 +7,7 @@ import {
   handleChange,
   clearValues,
   createJob,
+  editJob,
 } from '../../features/job/jobSlice'
 import Wrapper from '../../assets/wrappers/DashboardFormPage'
 
@@ -40,7 +41,22 @@ const AddJob = () => {
       return
     }
 
-    dispatch(createJob({ position, company, jobLocation, jobType, status }))
+    if (isEditing) {
+      dispatch(
+        editJob({
+          jobId: editJobId,
+          job: {
+            position,
+            company,
+            jobLocation,
+            jobType,
+            status,
+          },
+        })
+      )
+    } else {
+      dispatch(createJob({ position, company, jobLocation, jobType, status }))
+    }
   }
 
   const handleJobInput = (e) => {

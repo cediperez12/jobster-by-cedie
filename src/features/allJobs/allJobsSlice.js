@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { toast } from 'react-toastify'
 import { axiosCustomInstance } from '../../utils/axios'
+import { getAllJobsThunk, showStatsThunk } from './allJobsThunk'
 
 const initialFilterState = {
   search: '',
@@ -21,25 +22,9 @@ const initialState = {
   ...initialFilterState,
 }
 
-export const getAllJobs = createAsyncThunk(
-  'allJobs/getJobs',
-  async (_, thunkAPI) => {
-    let url = '/jobs'
+export const showStats = createAsyncThunk('allJobs/showStats', showStatsThunk)
 
-    try {
-      const response = await axiosCustomInstance.get(url, {
-        headers: {
-          Authorization: `Bearer ${thunkAPI.getState().user.user.token}`,
-        },
-      })
-
-      console.log(response)
-      return response.data
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data.msg)
-    }
-  }
-)
+export const getAllJobs = createAsyncThunk('allJobs/getJobs', getAllJobsThunk)
 
 const allJobSlice = createSlice({
   name: 'allJobs',
@@ -51,6 +36,24 @@ const allJobSlice = createSlice({
     hideLoading: (state) => {
       state.isLoading = false
     },
+    handleChange: (state, action) => {
+      const { payload } = action
+      const { name, value } = payload
+
+      state.page = 1
+      state[name] = value
+    },
+    clearFilters: (state) => {
+      return {
+        ...state,
+        initialFilterState,
+      }
+    },
+    changePage: (state, action) => {
+      const { payload } = action
+      state.page = payload
+    },
+    clearAllJobState: () => initialState,
   },
   extraReducers: (builder) => {
     builder
@@ -64,8 +67,27 @@ const allJobSlice = createSlice({
 
         state.isLoading = false
         state.jobs = payload.jobs
+        state.numOfPages = payload.numOfPages
+        state.totalJobs = payload.totalJobs
       })
       .addCase(getAllJobs.rejected, (state, action) => {
+        const { payload } = action
+
+        state.isLoading = false
+        toast.error(payload)
+      })
+
+      .addCase(showStats.pending, (state) => {
+        state.isLoading = true
+      })
+      .addCase(showStats.fulfilled, (state, action) => {
+        const { payload } = action
+
+        state.isLoading = false
+        state.stats = payload.defaultStats
+        state.monthlyApplications = payload.monthlyApplications
+      })
+      .addCase(showStats.rejected, (state, action) => {
         const { payload } = action
 
         state.isLoading = false
@@ -74,6 +96,13 @@ const allJobSlice = createSlice({
   },
 })
 
-export const { showLoading, hideLoading } = allJobSlice.actions
+export const {
+  showLoading,
+  hideLoading,
+  handleChange,
+  clearFilters,
+  changePage,
+  clearAllJobState,
+} = allJobSlice.actions
 
 export default allJobSlice.reducer

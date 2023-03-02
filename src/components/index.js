@@ -7,8 +7,14 @@ import BigSidebar from './BigSidebar'
 import JobsContainer from './JobsContainer'
 import SearchContainer from './SearchContainer'
 import Job from './Job'
+import StatsContainer from './StatsContainer'
+import ChartsContainer from './ChartsContainer'
+import Loading from './Loading'
 
 export {
+  Loading,
+  StatsContainer,
+  ChartsContainer,
   Logo,
   FormRow,
   Navbar,

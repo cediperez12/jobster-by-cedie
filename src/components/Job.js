@@ -6,6 +6,7 @@ import moment from 'moment'
 
 import Wrapper from '../assets/wrappers/Job'
 import JobInfo from './JobInfo'
+import { setEditJob, deleteJob } from '../features/job/jobSlice'
 
 const Job = ({
   _id,
@@ -39,10 +40,31 @@ const Job = ({
         </div>
         <footer>
           <div className="actions">
-            <Link className="btn edit-btn" to="/add-job">
+            <Link
+              className="btn edit-btn"
+              to="/add-job"
+              onClick={(e) => {
+                dispatch(
+                  setEditJob({
+                    editJobId: _id,
+                    position,
+                    company,
+                    jobLocation,
+                    company,
+                    jobType,
+                    status,
+                  })
+                )
+              }}
+            >
               Edit
             </Link>
-            <button className="btn delete-btn">Delete</button>
+            <button
+              className="btn delete-btn"
+              onClick={(e) => dispatch(deleteJob(_id))}
+            >
+              Delete
+            </button>
           </div>
         </footer>
       </div>
